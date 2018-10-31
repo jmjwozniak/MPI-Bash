@@ -6,6 +6,8 @@
 
 #include "mpibash.h"
 
+#include "comms.h"
+
 static int we_called_init = 0;  /* 1=we called MPI_Init(); 0=it was called for us */
 static char *all_mpibash_builtins[] = {  /* All builtins MPI-Bash defines except mpi_init */
   "mpi_abort",
@@ -19,6 +21,9 @@ static char *all_mpibash_builtins[] = {  /* All builtins MPI-Bash defines except
   "mpi_recv",
   "mpi_scan",
   "mpi_send",
+  "mpi_comm_dup",
+  "mpi_comm_split",
+  "mpi_comm_set",
   NULL
 };
 
@@ -90,6 +95,9 @@ mpi_init_builtin (WORD_LIST *list)
    * run.  Remove that variable from the environment. */
   if (mpibash_invoke_bash_command("unset", "LD_PRELOAD", NULL) != EXECUTION_SUCCESS)
     return EXECUTION_FAILURE;
+
+  mpibash_comm_init();
+
   return EXECUTION_SUCCESS;
 }
 

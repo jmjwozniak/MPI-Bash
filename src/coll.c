@@ -6,6 +6,8 @@
 
 #include "mpibash.h"
 
+#include "comms.h"
+
 /* Synchronize all of the MPI ranks. */
 static int
 mpi_barrier_builtin (WORD_LIST * list)
@@ -351,3 +353,130 @@ static char *mpi_allreduce_doc[] = {
 
 /* Describe the mpi_allreduce builtin. */
 DEFINE_BUILTIN(mpi_allreduce, "mpi_allreduce [-O operation] number name");
+
+static int
+mpi_comm_set_builtin (WORD_LIST * list)
+{
+  char *word;
+  intmax_t id;
+
+  YES_ARGS(list);
+  word = list->word->word;
+  if (!legal_number(word, &id)) {
+    builtin_error(_("mpi_comm_set: numeric comm-id required"));
+    return EX_USAGE;
+  }
+  list = list->next;
+  no_args(list);
+
+  if (!mpibash_comm_check(id)) {
+    builtin_error(_("mpi_comm_set: given id does not exist"));
+    return EX_USAGE;
+  }
+  mpibash_comm_current = mpibash_comms[id];
+
+  return EXECUTION_SUCCESS;
+}
+
+/* Define the documentation for the mpi_comm_dup builtin. */
+static char *mpi_comm_set_doc[] = {
+  "Sets the current communicator.",
+  "",
+  "",
+  "",
+  "Exit Status:",
+  "Returns 0 unless an invalid option is given or an error occurs.",
+  NULL
+};
+
+/* Describe the mpi_comm_set builtin. */
+DEFINE_BUILTIN(mpi_comm_set, "mpi_comm_set comm");
+
+/* Call MPI_Comm_dup. */
+static int
+mpi_comm_dup_builtin (WORD_LIST * list)
+{
+  YES_ARGS(list);
+  char *varname = list->word->word;
+  REQUIRE_WRITABLE(varname);
+  list = list->next;
+  no_args(list);
+
+  MPI_Comm newcomm;
+  MPI_TRY(MPI_Comm_dup(MPI_COMM_WORLD, &newcomm));
+
+  intmax_t id;
+  mpibash_comm_store(newcomm, &id);
+
+  mpibash_bind_variable_number(varname, id, 0);
+
+  return EXECUTION_SUCCESS;
+}
+
+/* Define the documentation for the mpi_comm_dup builtin. */
+static char *mpi_comm_dup_doc[] = {
+  "Does an MPI_Comm_dup.",
+  "Returns new comm in given variable name.",
+  "",
+  "",
+  "Exit Status:",
+  "Returns 0 unless an invalid option is given or an error occurs.",
+  NULL
+};
+
+/* Describe the mpi_barrier builtin. */
+DEFINE_BUILTIN(mpi_comm_dup, "mpi_comm_dup name");
+
+/* Call MPI_Comm_dup. */
+static int
+mpi_comm_split_builtin (WORD_LIST * list)
+{
+  char *word;
+  intmax_t color, key;
+
+  YES_ARGS(list);
+  word = list->word->word;
+  if (!legal_number(word, &color)) {
+    builtin_error(_("mpi_send: numeric color required"));
+    return EX_USAGE;
+  }
+  list = list->next;
+
+  YES_ARGS(list);
+  word = list->word->word;
+  if (!legal_number(word, &key)) {
+    builtin_error(_("mpi_send: numeric key required"));
+    return EX_USAGE;
+  }
+  list = list->next;
+
+  YES_ARGS(list);
+  char *varname = list->word->word;
+  REQUIRE_WRITABLE(varname);
+  list = list->next;
+  no_args(list);
+
+  MPI_Comm newcomm;
+  MPI_TRY(MPI_Comm_split(mpibash_comm_current, color, key, &newcomm));
+
+  intmax_t id;
+  mpibash_comm_store(newcomm, &id);
+
+  mpibash_bind_variable_number(varname, id, 0);
+
+  return EXECUTION_SUCCESS;
+}
+
+/* Define the documentation for the mpi_comm_dup builtin. */
+static char *mpi_comm_split_doc[] = {
+  "Does an MPI_Comm_split.",
+  "Returns new comm in given variable name.",
+  "",
+  "",
+  "Exit Status:",
+  "Returns 0 unless an invalid option is given or an error occurs.",
+  NULL
+};
+
+/* Describe the mpi_barrier builtin. */
+DEFINE_BUILTIN(mpi_comm_split, "mpi_comm_split color key name");

@@ -1,0 +1,11 @@
+#! /usr/bin/env mpibash
+
+enable -f mpibash.so mpi_init
+mpi_init
+mpi_comm_rank rank
+
+mpi_comm_split $rank $rank newcomm
+
+echo newcomm: $newcomm
+
+mpi_finalize

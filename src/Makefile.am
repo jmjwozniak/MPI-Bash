@@ -14,7 +14,8 @@ mpibash_la_SOURCES = \
 	init.c \
 	util.c \
 	pt2pt.c \
-	coll.c
+	coll.c \
+	comms.c
 mpibash_la_CPPFLAGS = $(BASH_CPPFLAGS)
 mpibash_la_LDFLAGS = -module -avoid-version
 
