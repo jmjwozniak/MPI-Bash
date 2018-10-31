@@ -10,6 +10,10 @@ echo newcomm: $newcomm
 
 mpi_comm_set $newcomm
 
+mpi_comm_rank rank
+
+echo rank: $rank
+
 # mpi_comm_launch
 
 mpi_finalize

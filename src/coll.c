@@ -374,6 +374,9 @@ mpi_comm_set_builtin (WORD_LIST * list)
     return EX_USAGE;
   }
   mpibash_comm_current = mpibash_comms[id];
+  MPI_Comm_rank (mpibash_comm_current, &mpibash_rank);
+  MPI_Comm_size (mpibash_comm_current, &mpibash_num_ranks);
+
 
   return EXECUTION_SUCCESS;
 }
