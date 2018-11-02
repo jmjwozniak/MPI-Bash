@@ -28,12 +28,6 @@ mpibash_comm_init()
 }
 
 bool
-mpibash_comm_check(intmax_t id)
-{
-  return (mpibash_comms[id] != 0); // Works for MPICH
-}
-
-int
 mpibash_comm_store(MPI_Comm comm, intmax_t *id_out)
 {
   intmax_t id;
@@ -51,4 +45,3 @@ mpibash_comm_store(MPI_Comm comm, intmax_t *id_out)
   *id_out = id;
   return true;
 }
-

@@ -20,6 +20,10 @@ bool mpibash_comm_init(void);
 /**
    Return true if the id is assigned to a valid communicator, else false.
  */
-bool mpibash_comm_check(intmax_t id);
+static inline bool
+mpibash_comm_check(intmax_t id)
+{
+  return (mpibash_comms[id] != 0); // Works for MPICH
+}
 
-int mpibash_comm_store(MPI_Comm comm, intmax_t *id_out);
+bool mpibash_comm_store(MPI_Comm comm, intmax_t *id_out);

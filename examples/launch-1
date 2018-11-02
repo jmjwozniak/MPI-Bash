@@ -14,6 +14,20 @@ mpi_comm_rank rank
 
 echo rank: $rank
 
-# mpi_comm_launch
+mpi_comm_launch hostname
+echo exit_code $?
+
+mpi_comm_launch echo HELLO
+echo exit_code $?
+
+if mpi_comm_launch
+then
+    echo "Should have caught 0 arguments!"
+    exit 1
+fi
 
 mpi_finalize
+
+# Local Variables:
+# mode: sh;
+# End:

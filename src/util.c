@@ -7,6 +7,8 @@
 
 #include "mpibash.h"
 
+#include "util.h"
+
 /* Perform the same operation as bind_variable, but with VALUE being a
  * number, not a string. */
 SHELL_VAR *
@@ -112,4 +114,27 @@ mpibash_find_callback_function (WORD_LIST *list, SHELL_VAR **user_func)
     return EXECUTION_FAILURE;
   }
   return EXECUTION_SUCCESS;
+}
+
+int
+mpibash_word_list_length(WORD_LIST *list)
+{
+  int result = 0;
+  for ( ; list != NULL; list = list->next) {
+    result++;
+  }
+  return result;
+}
+
+void
+mpibash_word_list_to_array(WORD_LIST *list, char ***array)
+{
+  int n = mpibash_word_list_length(list);
+  char** strings = xmalloc((n+1) * sizeof(char*));
+  int i = 0;
+  for ( ; list != NULL; list = list->next) {
+    strings[i++] = list->word->word;
+  }
+  strings[i] = NULL;
+  *array = strings;
 }

@@ -4,9 +4,14 @@
  * By Scott Pakin <pakin@lanl.gov> *
  ***********************************/
 
+#include <assert.h>
+
 #include "mpibash.h"
 
 #include "comms.h"
+#include "util.h"
+
+#include "MPIX_Comm_launch.h"
 
 /* Synchronize all of the MPI ranks. */
 static int
@@ -481,5 +486,39 @@ static char *mpi_comm_split_doc[] = {
   NULL
 };
 
-/* Describe the mpi_barrier builtin. */
+/* Describe the mpi_comm_split builtin. */
 DEFINE_BUILTIN(mpi_comm_split, "mpi_comm_split color key name");
+
+/* Call MPI_Comm_launch. */
+static int
+mpi_comm_launch_builtin (WORD_LIST * list)
+{
+  YES_ARGS(list);
+  char* cmd = list->word->word;
+  list = list->next;
+  char **argv;
+  mpibash_word_list_to_array(list, &argv);
+
+  MPI_Info info = MPI_INFO_NULL;
+  int exit_code;
+  MPI_TRY(MPIX_Comm_launch(cmd, argv,
+			   info, 0, mpibash_comm_current,
+			   &exit_code));
+
+  free(argv);
+  return exit_code;
+}
+
+/* Define the documentation for the mpi_comm_dup builtin. */
+static char *mpi_comm_launch_doc[] = {
+  "Does an MPI_Comm_launch.",
+  "",
+  "",
+  "",
+  "Exit Status:",
+  "Returns 0 unless an invalid option is given or an error occurs.",
+  NULL
+};
+
+/* Describe the mpi_comm_launch builtin. */
+DEFINE_BUILTIN(mpi_comm_launch, "mpi_comm_launch cmd args...");

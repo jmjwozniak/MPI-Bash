@@ -24,6 +24,7 @@ static char *all_mpibash_builtins[] = {  /* All builtins MPI-Bash defines except
   "mpi_comm_dup",
   "mpi_comm_split",
   "mpi_comm_set",
+  "mpi_comm_launch",
   NULL
 };
 
