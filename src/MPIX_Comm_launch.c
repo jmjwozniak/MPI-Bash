@@ -220,6 +220,9 @@ int MPIX_Comm_launch(const char* cmd, char** argv,
 	               root, comm);
 	if(r) goto fn_error;
 
+	// Set default value of exit code for non-root processes
+	int ec = 0;
+
 	// printf("exec\n");   fflush(stdout);
 	if(rank == root) {
 
@@ -309,9 +312,13 @@ int MPIX_Comm_launch(const char* cmd, char** argv,
 		// printf("mpicmd: %s\n", mpicmd); fflush(stdout);
 
 		// calls the system command
-		*exit_code = system(mpicmd);
-		*exit_code = WEXITSTATUS(*exit_code);
-		if (*exit_code == 127)
+		ec = system(mpicmd);
+		printf("exit_code1: %i\n", ec);
+		if (WIFEXITED(ec)) {
+		  ec = WEXITSTATUS(ec);
+		  printf("exit_code2: %i\n", ec);
+		}
+		if (ec == 127)
 			printf("MPIX_Comm_launch(): command exited with code 127.\n"
 					"Check that your desired program is in PATH.\n"
 					"command was: %s\n", mpicmd);
@@ -329,9 +336,10 @@ int MPIX_Comm_launch(const char* cmd, char** argv,
 		free(launcher);
 		free(redirect);
 	}
-
+	*exit_code = ec;
 	// broadcast the exit status
 	MPI_Bcast(exit_code, 1, MPI_INT, root, comm);
+	printf("bcast exit_code: %i\n", *exit_code);
 
 fn_exit:
 	if(allhosts) free(allhosts);
