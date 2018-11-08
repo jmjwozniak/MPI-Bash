@@ -335,12 +335,14 @@ int MPIX_Comm_launch(const char* cmd, char** argv,
 
 fn_exit:
 	if(allhosts) free(allhosts);
+	printf("r: %i\n", r);
 	return r;
 fn_error:
 	MPI_Abort(MPI_COMM_WORLD,-1);
 	goto fn_exit;
 
 	// Unreachable - for Eclipse:
+	assert(0);
 	return -1;
 }
 
