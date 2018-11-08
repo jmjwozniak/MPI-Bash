@@ -500,7 +500,7 @@ mpi_comm_launch_builtin (WORD_LIST * list)
   mpibash_word_list_to_array(list, &argv);
 
   MPI_Info info = MPI_INFO_NULL;
-  int exit_code;
+  int exit_code = 0;
   MPI_TRY(MPIX_Comm_launch(cmd, argv,
 			   info, 0, mpibash_comm_current,
 			   &exit_code));
