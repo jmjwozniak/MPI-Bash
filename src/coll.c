@@ -504,7 +504,7 @@ mpi_comm_launch_builtin (WORD_LIST * list)
   MPI_TRY(MPIX_Comm_launch(cmd, argv,
 			   info, 0, mpibash_comm_current,
 			   &exit_code));
-
+  if (exit_code != 0) printf("warning: exit code is %i\n", exit_code);
   free(argv);
   return exit_code;
 }
